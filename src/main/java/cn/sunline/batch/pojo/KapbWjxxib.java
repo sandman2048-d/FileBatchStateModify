@@ -1,7 +1,9 @@
 package cn.sunline.batch.pojo;
 
 
-public class KapbWjxxib {
+import java.io.Serializable;
+
+public class KapbWjxxib implements Serializable {
 
   private String farendma;
   private String pljypich;

@@ -20,7 +20,7 @@ public class FileBatchStateQueryService {
     private FileBatchStateModifyMapper mapper;
 
     public KapbWjxxib query(String pljypich, String picihaoo, BaseEnum plwenjzht) {
-        KapbWjxxib result = mapper.query(pljypich, picihaoo, plwenjzht);
+        KapbWjxxib result = mapper.query(pljypich);
         return result;
     }
 

@@ -2,10 +2,13 @@ package cn.sunline.batch.controller;
 
 
 import cn.sunline.batch.pojo.BaseEnum;
+import cn.sunline.batch.pojo.KapbPlztxgrz;
 import cn.sunline.batch.pojo.KapbWjxxib;
 import cn.sunline.batch.pojo.Result;
+import cn.sunline.batch.service.FileBatchStateLogService;
 import cn.sunline.batch.service.FileBatchStateModifyService;
 import cn.sunline.batch.service.FileBatchStateQueryService;
+import com.alibaba.fastjson.JSONArray;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -20,7 +23,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +39,8 @@ import java.util.Map;
 public class BaseController {
     @Resource
     private ApplicationContext applicationContext;
+    @Resource
+    private FileBatchStateLogService fileBatchStateLogService;
     @GetMapping("/query")
     @ResponseBody
     public Result query(HttpServletRequest request, String pljypich, String picihaoo, BaseEnum plwenjzht, String datasource) throws NoSuchMethodException, NoSuchFieldException, IllegalAccessException, InvocationTargetException, InstantiationException {
@@ -71,9 +78,28 @@ public class BaseController {
             Map map = (Map)memberValues.get(invocationHandler);
             map.put("value",datasource);
             FileBatchStateModifyService fileBatchStateModifyService = applicationContext.getBean(aClass);
-            return fileBatchStateModifyService.turnS8ByPljypich(pljypich);
+            KapbWjxxib oldKapbWjxxib = fileBatchStateModifyService.queryOne(pljypich);
+            if (oldKapbWjxxib==null){
+                throw new RuntimeException("未找到该批次号对应记录");
+            }
+            if (oldKapbWjxxib.getPlwenjzt().equals(BaseEnum.S8.name())||oldKapbWjxxib.getPlwenjzt().equals(BaseEnum.D8.name())){
+                throw new RuntimeException("只能修改非D8 S8状态的批量状态");
+            }
+            Result result = fileBatchStateModifyService.turnS8ByPljypich(pljypich);
+            KapbWjxxib newKapbWjxxib = fileBatchStateModifyService.queryOne(pljypich);
+            if (result.getCode().equals(BaseEnum.success.name())){
+                KapbPlztxgrz kapbPlztxgrz = new KapbPlztxgrz();
+                kapbPlztxgrz.setDate(new Timestamp((new Date()).getTime()));
+                kapbPlztxgrz.setEnvironment(datasource);
+                kapbPlztxgrz.setIp(request.getRemoteAddr());
+                kapbPlztxgrz.setUser(username);
+                kapbPlztxgrz.setOldData(JSONArray.toJSONString(oldKapbWjxxib));
+                kapbPlztxgrz.setNewData(JSONArray.toJSONString(newKapbWjxxib));
+                fileBatchStateLogService.addLog(kapbPlztxgrz);
+            }
+            return result;
         }  catch (Exception e) {
-            return new Result("fail",e.getMessage(),null);
+            return new Result(BaseEnum.fail.name(),e.getMessage(),null);
         }
     }
 

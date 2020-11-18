@@ -20,18 +20,17 @@ public class FileBatchStateModifyService {
     @Resource
     private FileBatchStateModifyMapper mapper;
 
-    public Result turnS8ByPljypich(String pljypich){
-        try {
-            int row = mapper.turnS8ByPljypich(pljypich);
-            if(row==1){
-                return new Result(BaseEnum.success.name(),"交易成功",null);
-            }
-            if(row==0){
-                return new Result(BaseEnum.fail.name(),"交易失败，未找到对应批次号",null);
-            }
-            return new Result(BaseEnum.fail.name(),"交易失败,未知错误",null);
-        } catch (Exception e) {
-            return new Result(BaseEnum.fail.name(),e.getMessage(),null);
+    public KapbWjxxib queryOne(String pljypich) {
+        return mapper.query(pljypich);
+    }
+
+    public Result turnS8ByPljypich(String pljypich) {
+
+        int row = mapper.turnS8ByPljypich(pljypich);
+        if (row == 1) {
+            return new Result(BaseEnum.success.name(), "交易成功", null);
         }
+        throw new RuntimeException("数据修改失败，未知错误");
+
     }
 }
