@@ -10,7 +10,24 @@ public class KapbPlztxgrz {
   private String newData;
   private String environment;
   private java.sql.Timestamp date;
+  private String job;
+  private String comments;
 
+  public String getJob() {
+    return job;
+  }
+
+  public void setJob(String job) {
+    this.job = job;
+  }
+
+  public String getComments() {
+    return comments;
+  }
+
+  public void setComments(String comments) {
+    this.comments = comments;
+  }
 
   public long getNo() {
     return no;

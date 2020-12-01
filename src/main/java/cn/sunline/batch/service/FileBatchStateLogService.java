@@ -14,12 +14,12 @@ import java.sql.Timestamp;
  * @Date: Create in 13:49 2020/11/18
  */
 @Service
-@DS("ds1")
+@DS("dev")
 public class FileBatchStateLogService {
     @Resource
     private FileBatchStateModifyMapper mapper;
 
     public void addLog(KapbPlztxgrz plztxgrz){
-        mapper.addLog(plztxgrz.getUser(),plztxgrz.getIp(),plztxgrz.getOldData(),plztxgrz.getNewData(),plztxgrz.getEnvironment(),plztxgrz.getDate());
+        mapper.addLog(plztxgrz.getUser(),plztxgrz.getIp(),plztxgrz.getOldData(),plztxgrz.getNewData(),plztxgrz.getEnvironment(),plztxgrz.getDate(),plztxgrz.getJob(),plztxgrz.getComments());
     }
 }
