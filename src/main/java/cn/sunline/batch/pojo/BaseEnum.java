@@ -6,5 +6,5 @@ package cn.sunline.batch.pojo;
  * @Date: Create in 9:59 2020/11/18
  */
 public enum BaseEnum {
-    F1,F2,F3,F4,S8,D8,fail,success
+    F1,F2,F3,F4,S8,D8,fail,success,update,select,insert,delete
 }
