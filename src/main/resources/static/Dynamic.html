@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>Sunline</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<link rel="stylesheet" href="layui/css/layui.css" media="all">
+	<!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
+</head>
+
+<body>
+
+
+	<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+		<legend>交易日期查询</legend>
+	</fieldset>
+
+	<form class="layui-form" action="" id="dynamicForm">
+		<div class="layui-form-item">
+			<label class="layui-form-label">数据源 :</label>
+			<div class="layui-input-block">
+				<select name="datasource" lay-filter="datasource" name="datasource" id="datasource">
+				</select>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">功能 :</label>
+			<div class="layui-input-block">
+				<select name="sqlid" lay-filter="sqlid" name="sqlid" id="sqlid">
+				</select>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">sql :</label>
+			<div class="layui-input-block">
+				<input name="sql" lay-filter="sql" name="sql" id="sql" class="layui-input" disabled>
+				</input>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">认证标识 :</label>
+			<div class="layui-input-block">
+			  <input id="authcode" type="text" name="authcode" lay-verify="title" autocomplete="off" placeholder="请输入authcode"
+				class="layui-input">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">用户名 :</label>
+			<div class="layui-input-block">
+				<input id="username" type="text" name="username" placeholder="请输入username" autocomplete="off"
+					class="layui-input">
+			</div>
+		</div>
+	</form>
+	<form class="layui-form" action="" id="paramForm">
+
+	</form>
+
+	<div class="layui-form-item">
+		<div class="layui-input-block">
+			<button type="button" class="layui-btn" lay-filter="submit" lay-submit="">执行</button>
+		</div>
+	</div>
+
+	<script src="layui/layui.js" charset="utf-8"></script>
+	<script src="js/common.js" charset="utf-8"></script>
+	<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+	<script>
+		layui.use(['form', 'layedit'], function () {
+			var layer = layui.layer;
+			var form = layui.form;
+			var $ = layui.jquery;
+			var datasource = document.getElementById('datasource');
+			var sqlid = document.getElementById('sqlid');
+			var sql = document.getElementById('sql');
+			var authcode = document.getElementById('authcode');
+			var username = document.getElementById('username');
+			var paramData = null;
+			var params = null;
+			// window.onload = function () {
+			// 	queryDatasource();
+			// 	querySql();
+			// };
+			$(function(){
+				queryDatasource();
+				querySql();
+			});
+			form.on('select(sqlid)', function (data) {
+				// alert("a");
+				rendParam(data.value);
+			});
+			// form.on('select(datasource)', function (data) {
+			// 	// alert("a");
+			// 	rendParam(data.value);
+			// });
+			form.on('submit(submit)', function (data) {
+				// alert("a");
+				submit();
+			});
+			function queryDatasource() {
+				$.ajax({
+					url: dynamicUrl + "queryDatasource",
+					data: {
+
+					},
+					type: "get",
+					dataType: "json",
+					success: function (data) {
+						if (data.code == "fail") {
+							layer.alert(data.message);
+							return;
+						}
+						var list = data.data;
+						var select = datasource;
+						for (i = select.options.length - 1; i >= 0; i--) {
+							select.options[i] = null;
+						}
+						list.sort(function(a,b){
+							if(a.env==b.env){
+								return a.dcnno.localeCompare(b.dcnno);
+							}else{
+								return a.env.localeCompare(b.env);
+							}
+						});
+						//a.localeCompare(b)
+						// list.sort((a, b)=> b.env.charCodeAt(0)-a.env.charCodeAt(0));
+						if (list != null || list.size() > 0) {
+							for (var c in list) {
+								var option = document.createElement("option");
+								option.setAttribute("value", list[c].id);
+								option.innerText = list[c].env + "--" + list[c].dcnno;
+								select.appendChild(option)
+							}
+						};
+						form.render("select");
+					},
+					error: function (data) {
+						console.log(data);
+					}
+				})
+			};
+			function querySql() {
+				$.ajax({
+					url: dynamicUrl + "querySql",
+					data: {
+
+					},
+					type: "get",
+					dataType: "json",
+					success: function (data) {
+						if (data.code == "fail") {
+							layer.alert(data.message);
+							return;
+						}
+						var list = data.data;
+						var select = sqlid;
+						for (i = select.options.length - 1; i >= 0; i--) {
+							select.options[i] = null;
+						}
+						if (list != null || list.size() > 0) {
+							for (var c in list) {
+								var option = document.createElement("option");
+								option.setAttribute("value", list[c].sqlid);
+								option.innerText = list[c].sqlname;
+								select.appendChild(option);
+							}
+						};
+						paramData = list;
+
+						form.render("select");
+						rendParam(sqlid.value);
+
+					},
+					error: function (data) {
+						console.log(data);
+					}
+				});
+
+			};
+
+			function rendParam(value) {
+				// // alert(value);
+
+				if (paramData != null || paramData.size() > 0) {
+					for (var c in paramData) {
+						if (paramData[c].sqlid == value) {
+							params = paramData[c].param;
+							sql.value=paramData[c].sql;
+						}
+					}
+				};
+				$("#paramForm").empty();
+				for (var c in params) {
+					var str = '<div class="layui-form-item">' +
+						'<label class="layui-form-label">' + params[c] + ':</label>' +
+						'<div class="layui-input-block">' +
+						'<input type="text" name="' + params[c] + '" id="' + params[c] + '" class="layui-input input-double-width">' +
+						'</div>';
+					$("#paramForm").append(str);
+				}
+
+
+			};
+
+			function submit() {
+				var paramMap = {};
+				for (var c in params) {
+					var param = document.getElementById(params[c]);
+					// paramMap.set(params[c],param.value);
+					paramMap[params[c]]=param.value;
+				}
+				// var d = $.stringify(paramMap);
+				var mstr = JSON.stringify(paramMap);
+				$.ajax({
+					url: dynamicUrl + "excuteSql",
+					data: {
+						"datasource": datasource.value,
+						"sqlid": sqlid.value,
+						"paramMap": mstr,
+						"authcode": authcode.value,
+						"username": username.value
+					},
+					type: "post",
+					dataType: "json",
+					success: function (data) {
+						console.log(data);
+						if (data.code == "fail") {
+							layer.alert(data.message);
+							return;
+						} else {
+							layer.alert(data.message);
+						}
+					},
+					error: function (data) {
+						console.log(data);
+
+						// $.messager.alert('错误',data.msg);
+					}
+				})
+			};
+
+
+		});
+	</script>
+
+</body>
+
+</html>

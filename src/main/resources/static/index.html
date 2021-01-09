@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>Sunline</title>
+  <link rel="stylesheet" type="text/css" href="layui/css/layui.css">
+</head>
+<body class="layui-layout-body">
+
+  
+  <div class="layui-side layui-bg-black" id="boddy">
+	  
+	  
+    <div class="layui-side-scroll" >
+      <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+      <ul class="layui-nav layui-nav-tree"  lay-filter="test">
+        <li class="layui-nav-item layui-nav-itemed">
+          <!-- <a class="" href="javascript:;" > -->
+			  <img src="img/sign.png" id="img" height="50px" width="150px"/ >
+		  <!-- </a> -->
+          <!-- <dl class="layui-nav-child"> -->
+            <dd><a href="QueryAuthCode.html" target="iframe">获取认证标识</a></dd>
+            <dd><a href="FilebatchState.html" target="iframe">批量状态修改</a></dd>
+            <dd><a href="BatchRunningState.html" target="iframe">批量执行标志修改</a></dd>
+            <dd><a href="QueryDate.html" target="iframe">系统交易日期查询</a></dd>
+            <dd><a href="Dynamic.html" target="iframe">自定义运行</a></dd>
+          <!-- </dl> -->
+        </li>
+      </ul>
+    </div>
+  </div>
+  
+  <div class="layui-body">
+    <!-- 内容主体区域 -->
+    <iframe src="" id="main" width="100%" style="height: 99.9%" frameborder="0" name = "iframe"></iframe>
+  </div>
+  <div class="layui-footer">
+    <!-- 底部固定区域 -->
+    © layui.com - 底部固定区域
+  </div>
+</div>
+<script src="layui/layui.js"></script>
+<script>
+  
+//JavaScript代码区域
+layui.use(['element','jquery'], function(){
+  var $=layui.jquery;
+  var element = layui.element;
+  $(document).ready(function(){
+  $("dd>a").click(function (e) {
+      e.preventDefault();
+      $("#main").attr("src",$(this).attr("href"));
+    });
+  });
+  // $("#cloud").click(function(){$("#main").html("jaosgoaighowg");});
+});
+</script>
+</body>
+</html>
+ 
